@@ -1,0 +1,42 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "My volume stack.",
+  "Parameters": {
+    "InstanceId": {
+      "Type": "String",
+      "Description": "Instance id.",
+      "AllowedPattern": ".+",
+      "ConstraintDescription": "Instance id is required."
+    },
+    "AvailabilityZone": {
+      "Type": "String",
+      "Description": "Availability zone of the instance.",
+      "AllowedPattern": ".+",
+      "ConstraintDescription": "Availability zone is required."
+    }
+  },
+  "Resources": {
+    "MyVolume": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone"
+        },
+        "Size": "1",
+        "VolumeType": "gp2"
+      }
+    },
+    "MyVolumeAttachment": {
+      "Type": "AWS::EC2::VolumeAttachment",
+      "Properties": {
+        "InstanceId": {
+          "Ref": "InstanceId"
+        },
+        "VolumeId": {
+          "Ref": "MyVolume"
+        },
+        "Device": "/dev/sdb"
+      }
+    }
+  }
+}

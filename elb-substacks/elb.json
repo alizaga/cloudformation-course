@@ -1,0 +1,46 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "ELB stack.",
+  "Parameters": {
+    "AvailabilityZone": {
+      "Type": "String",
+      "Description": "Resources availability zone.",
+      "AllowedPattern": ".+",
+      "ConstraintDescription": "Availability zone is required.",
+      "Default": "us-east-2c"
+    }
+  },
+  "Resources": {
+    "Balancer": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "AvailabilityZones": [
+          {
+            "Ref": "AvailabilityZone"
+          }
+        ],
+        "Listeners": [
+          {
+            "LoadBalancerPort": "80",
+            "InstancePort": "80",
+            "Protocol": "TCP",
+            "InstanceProtocol": "TCP"
+          }
+        ],
+        "HealthCheck": {
+          "Target": "TCP:80",
+          "HealthyThreshold": "2",
+          "UnhealthyThreshold": "2",
+          "Interval": "10",
+          "Timeout": "5"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "BalancerId": {
+      "Description": "Balancer id.",
+      "Value": { "Ref": "Balancer" }
+    }
+  }
+}

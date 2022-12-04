@@ -1,0 +1,78 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Mi first stack.",
+  "Parameters": {
+    "ImageId": {
+      "Type": "String",
+      "Description": "Instance image.",
+      "AllowedValues": [
+        "ami-0beaa649c482330f7"
+      ]
+    },
+    "InstanceType": {
+      "Type": "String",
+      "Description": "Instance type.",
+      "AllowedValues": [
+        "t2.micro",
+        "t2.small"
+      ],
+      "Default": "t2.micro"
+    },
+    "KeyPair": {
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "Description": "KeyPair to access into the instance.",
+      "AllowedPattern": ".+",
+      "ConstraintDescription": "You must specify a key pair name."
+    }
+  },
+  "Resources": {
+    "MyInstanceStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://cf-templates-1ku9u3tl7evys-us-east-2.s3.us-east-2.amazonaws.com/substacks/instance.json",
+        "Parameters": {
+          "ImageId": {
+            "Ref": "ImageId"
+          },
+          "InstanceType": {
+            "Ref": "InstanceType"
+          },
+          "KeyPair": {
+            "Ref": "KeyPair"
+          }
+        }
+      }
+    },
+    "MyVolumeStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": "https://cf-templates-1ku9u3tl7evys-us-east-2.s3.us-east-2.amazonaws.com/substacks/volume.json",
+        "Parameters": {
+          "InstanceId": {
+            "Fn::GetAtt": [
+              "MyInstanceStack",
+              "Outputs.InstanceId"
+            ]
+          },
+          "AvailabilityZone": {
+            "Fn::GetAtt": [
+              "MyInstanceStack",
+              "Outputs.AvailabilityZone"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "PublicIp": {
+      "Description": "Public IP of the instance.",
+      "Value": {
+        "Fn::GetAtt": [
+          "MyInstanceStack",
+          "Outputs.PublicIp"
+        ]
+      }
+    }
+  }
+}
